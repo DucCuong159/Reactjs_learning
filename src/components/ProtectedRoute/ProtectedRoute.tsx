@@ -1,3 +1,4 @@
+import React from "react";
 import { Flex, Space, Spin, Typography } from "antd";
 import { Redirect, Route, RouteProps } from "react-router-dom";
 import { PATHS } from "../../constants/paths";
@@ -15,6 +16,7 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const user = useAppSelector((state) => state.auth.user);
   const isLoading = useAppSelector((state) => state.auth.loading);
+  const authError = useAppSelector((state) => state.auth.error);
 
   return (
     <Route
@@ -31,6 +33,24 @@ const ProtectedRoute = ({
               <Space direction="vertical" size="large" align="center">
                 <Spin size="large" />
                 <Text type="secondary">Checking authentication...</Text>
+              </Space>
+            </Flex>
+          );
+        }
+        if (authError) {
+          return (
+            <Flex
+              justify="center"
+              align="center"
+              style={{ height: "calc(100vh - 64px)" }}
+            >
+              <Space direction="vertical" size="large" align="center">
+                <Text type="danger">Authentication Error</Text>
+                <Text type="secondary">{authError}</Text>
+                <Text type="secondary">
+                  Please try refreshing the page or{" "}
+                  <a href={PATHS.LOGIN}>sign in again</a>.
+                </Text>
               </Space>
             </Flex>
           );
