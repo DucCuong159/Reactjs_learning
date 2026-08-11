@@ -22,13 +22,19 @@ function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        dispatch(setAuthUser({ user: session.user, session }));
-      } else {
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (session) {
+          dispatch(setAuthUser({ user: session.user, session }));
+        } else {
+          dispatch(setAuthLoading(false));
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to retrieve auth session:", error);
         dispatch(setAuthLoading(false));
-      }
-    });
+      });
 
     const subscription = setupAuthListener();
 
