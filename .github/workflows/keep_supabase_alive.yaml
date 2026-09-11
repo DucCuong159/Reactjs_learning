@@ -27,14 +27,17 @@ jobs:
           CLEAN_URL="${SUPABASE_URL%/}"
 
           echo "Pinging: $CLEAN_URL/rest/v1/"
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$CLEAN_URL/rest/v1/" \
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$CLEAN_URL/rest/v1/" \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n1)
+          HTTP_BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
 
           echo "HTTP Status: $HTTP_STATUS"
 
           if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
             echo "Ping thanh cong! Supabase database da duoc danh thuc va dang hoat dong."
           else
-            echo "::warning::Nhan HTTP status $HTTP_STATUS khi ping Supabase. Vui long kiem tra lai secrets."
+            echo "::error::Ping Supabase that bai voi HTTP status $HTTP_STATUS! Response: $HTTP_BODY"
+            exit 1
           fi
